@@ -25,3 +25,44 @@ _Note: If your plugin packages its own dependencies you need to provide an expli
 
 ## License
 Augury is made available under [GPLv3 License](http://www.gnu.org/licenses/gpl-3.0.html)
+
+# Creating a Plugin
+## Maven
+Set plugin-parent as project parent to inherit required dependencies and plugin configuration
+```xml
+<parent>
+  <groupId>com.augury</groupId>
+  <artifactId>plugin-parent</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
+</parent>
+```
+## Implementation
+```java
+@Component //For spring to add implementation to PluginRegistry
+@Order(999) //Priority for multiple plugins supporting an specific SCM or IT platform. Lower number, higher priority
+public class GithubPlugin implements SourceControlPlugin {
+	@Autowired
+	Environment env;
+	
+	//Initiasation logic based on parameters supplied by env
+	@Override
+	public void initialise() {
+		//...
+	}
+
+	//Specify lookup string to retrieve this implementation from the PluginRegistry
+	@Override
+	public boolean supports(String delimiter) {
+		return "GITHUB".equalsIgnoreCase(delimiter);
+	}
+	
+	//Implement required functionality
+	@Override
+	public List<String> getBranchList() {
+	}
+}
+```
+## Build & Package
+Package the plugin jar in a [MODULE layout](https://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#build-tool-plugins-gradle-configuration-layouts)
+
+`mvn clean package spring-boot:repackage`
